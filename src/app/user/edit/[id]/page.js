@@ -1,18 +1,28 @@
 "use client";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-export default function AddPage() {
-  const [data, setData] = useState({ name: "", username: "" });
-  const [loading, setLoading] = useState(false);
+export default function EditPage() {
+  const [data, setData] = useState({ name: "", username: "" }); 
   const router = useRouter();
-  const PostUser = async (event) => {
-    event.preventDefault();
-    setLoading(true);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/users/${id}`)
+        .then((res) => res.json())
+        .then((user) => {
+          setData({ name: user.name, username: user.username });
+        })
+        .catch((err) => console.error("Error fetching user:", err));
+    }
+  }, [id]);
+  const EditUser = async (event) => {
+    event.preventDefault(); 
     try {
-      const response = await fetch(`/api/users/`, {
-        method: "POST",
+      const response = await fetch(`/api/users/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -22,26 +32,20 @@ export default function AddPage() {
       const responseData = await response.json();
       if (response.ok) {
         alert(responseData.message);
-        setData({ name: "", username: "" });
-        router.push("/");
+        router.push("/");  
       } else {
         alert(responseData.error || "Something went wrong.");
       }
     } catch (error) {
       console.error(error);
       alert("An error occurred.");
-    } finally {
-      setLoading(false);
-    }
+    }  
   };
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-          Add New Card
-        </h2>
-        <form className="flex flex-col gap-4" onSubmit={PostUser}>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Edit Card</h2>
+        <form className="flex flex-col gap-4" onSubmit={EditUser}>
           <div>
             <label className="block text-gray-700 font-medium mb-1">Name</label>
             <input
@@ -49,7 +53,6 @@ export default function AddPage() {
               onChange={(e) =>
                 setData((prev) => ({ ...prev, name: e.target.value }))
               }
-              required
               type="text"
               placeholder="Enter name"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -58,14 +61,13 @@ export default function AddPage() {
 
           <div>
             <label className="block text-gray-700 font-medium mb-1">
-              Username
+              Usename
             </label>
             <input
               value={data.username}
               onChange={(e) =>
                 setData((prev) => ({ ...prev, username: e.target.value }))
               }
-              required
               type="text"
               placeholder="Enter username"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -74,14 +76,9 @@ export default function AddPage() {
 
           <button
             type="submit"
-            disabled={loading}
-            className={`py-2 rounded-lg transition ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-500 text-white hover:bg-green-600"
-            }`}
+            className="bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition"
           >
-            {loading ? "Adding..." : "Add Card"}
+            Edit Card
           </button>
         </form>
       </div>

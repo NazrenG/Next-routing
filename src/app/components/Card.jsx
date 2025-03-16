@@ -1,13 +1,23 @@
 "use client";
 import Link from "next/link";
 export default function Card({ card }) {
-  const DeleteUser = async ({ id }) => {
-    const response = await fetch(`/api/users/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  const DeleteUser = async (id) => {
+    try {
+      const response = await fetch(`/api/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Error something");
+      }
+      const data = await response.json();
+      alert(data.message);
+    } catch (error) {
+      alert("Error:" + error);
+    }
+
     alert(response);
   };
 
@@ -24,7 +34,7 @@ export default function Card({ card }) {
         >
           Delete
         </button>
-        <Link href="/user/edit">
+        <Link href={`/user/edit/${card.id}`}>
           <button className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition">
             Update
           </button>

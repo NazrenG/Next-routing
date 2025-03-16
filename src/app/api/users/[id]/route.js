@@ -11,14 +11,16 @@ export async function DELETE(req, { params }) {
     }
   );
 }
-export async function PUT(req, { param }) {
-  const userId = await param.id;
+
+export async function PUT(req, { params }) {
+  const userId = params.id;
+
   const body = await req.json();
   console.log(userId);
 
   return new Response(
     JSON.stringify({
-      message: `User with id: ${userId} is updated with ${body.data}`,
+      message: `User  is updated succesfull`,
     }),
     {
       headers: {
